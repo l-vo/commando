@@ -775,7 +775,21 @@ class Command implements \ArrayAccess, \Iterator
 
         $seen = array();
         $keys = array_keys($this->options);
-        natsort($keys);
+
+        $helpOption = $this->getOption('help');
+        usort($keys, function ($val1, $val2) use ($helpOption) {
+            if ($val1 === 'help' || $this->getOption($val1) == $helpOption) {
+                return 1;
+            }
+
+            if ($val2 === 'help' || $this->getOption($val2) == $helpOption) {
+                return -1;
+            }
+
+            $ret = strcmp($val1, $val2);
+            return $ret;
+        });
+
         foreach ($keys as $key) {
             $option = $this->getOption($key);
             if (in_array($option, $seen)) {
